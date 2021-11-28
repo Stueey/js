@@ -189,7 +189,7 @@ this.world();
     //console.log('left');
   } else if (this.cursors.right.isDown) {
     this.player.body.setVelocityX(200);
-    this.player.anims.play("right", true);
+    this.player.anims.play("left", true);
     this.player.flipX = true; // use the original sprite looking to the right
     //console.log('right');
   } else if (this.cursors.up.isDown) {
