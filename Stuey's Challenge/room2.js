@@ -207,7 +207,7 @@ this.world();
 
  zuzuOverlap() {
   console.log(" zuzu overlap player");
-  this.scene.start("main");
+  this.scene.start("GameOver");
 }
 
 //player touch the item then collet them

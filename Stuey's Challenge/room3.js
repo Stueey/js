@@ -161,13 +161,13 @@ this.time.addEvent({
  
 zuzuOverlap() {
   console.log(" zuzu overlap player");
-  this.scene.start("main");
+  this.scene.start("GameOver");
 }
 
 
 dashaOverlap() {
   console.log(" dasha overlap player");
-  this.scene.start("main");
+  this.scene.start("GameOver");
 }
 
  moveDownUp() {
