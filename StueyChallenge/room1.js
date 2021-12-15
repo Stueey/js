@@ -17,15 +17,31 @@ class room1 extends Phaser.Scene {
 this.load.tilemapTiledJSON("room1", "assets/room1.json");
 this.load.atlas('dasha','assets/dasha.png', 'assets/dasha.json')
 //this.load.atlas('coin','assets/coin.png', 'assets/coin.json')
-this.load.atlas('coin2','assets/coin.png', 'assets/coin.json')
+// this.load.atlas('coin2','assets/coin.png', 'assets/coin.json')
+// this.load.atlas('coinS','assets/coinS.png', 'assets/coinS.json')
 
 // Step 2 : Preload any images here, nickname, filename
 this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
+this.load.image("coin", "assets/coin.png");
+this.load.image("coinS", "assets/coinS.png");
+
+
+
+this.sound1 = this.sound.add('coinss');
+this.sound2 = this.sound.add('losingSound');
+
+
+
 
     }
 
-    create() {
+create() {
+
         console.log('*** room1 scene');
+
+
+
+
 
  //Step 3 - Create the map from main
  var map = this.make.tilemap({key: 'room1'});
@@ -35,20 +51,23 @@ this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
     // 2nd parameter is key in Preload
     //var village = map.addTilesetImage("village", "village");
     var pipoya = map.addTilesetImage("pipoya", "pipoya");
-    var coni2 = map.addTilesetImage("coin","coin2")
+    var coni2 = map.addTilesetImage("coin","coin")
+    var coinS = map.addTilesetImage("coinS","coinS")
+
 
     // Step 5  Load in layers by layers
     this.floorLayer = map.createLayer("floorLayer", [pipoya], 0, 0);
     this.wallLayer = map.createLayer("wallLayer", [pipoya], 0, 0);
     this.decoLayer = map.createLayer("decoLayer", [pipoya], 0, 0);
     this.bookLayer = map.createLayer("bookLayer", [pipoya], 0, 0);
+    this.coinSLayer = map.createLayer("coinSLayer", coinS, 0,0);
     this.coinLayer = map.createLayer("coinLayer", coni2, 0,0);
-
-//character animation
+    
+//character animation NPC dasha
 this.anims.create({
   key: 'dasha',
   frames:[
-      {key:'dasha', frame: 'dashaDown1.png'},
+       {key:'dasha', frame: 'dashaDown1.png'},
        {key:'dasha', frame: 'dashaDown2.png'},
        {key:'dasha', frame: 'dashaDown3.png'},
       // {key:'dasha', frame: 'dashaLeft1.png'},
@@ -57,7 +76,7 @@ this.anims.create({
       // {key:'dasha', frame: 'dashaRight1.png'},
       // {key:'dasha', frame: 'dashaRight2.png'},
       // {key:'dasha', frame: 'dashaRight3.png'},
-      {key:'dasha', frame: 'dashaUp1.png'},
+       {key:'dasha', frame: 'dashaUp1.png'},
        {key:'dasha', frame: 'dashaUp2.png'},
        {key:'dasha', frame: 'dashaUp3.png'},
       
@@ -66,17 +85,6 @@ this.anims.create({
   repeat:-1,
 })
 
-this.anims.create({
-  key: 'coins',
-  frames:[
-      {key:'coin', frame: 'coin(1).png'},
-      {key:'coin', frame: 'coin(2).png'},
-      {key:'coin', frame: 'coin(3).png'},
-      {key:'coin', frame: 'coin(4).png'},
-  ],
-  frameRate:10,
-  repeat:-1,
-})
 
 /// The character
 this.player = this.physics.add.sprite(
@@ -102,34 +110,35 @@ this.physics.world.bounds.height = this.floorLayer.height;
  
 this.cursors = this.input.keyboard.createCursorKeys();
 
-// //load object COin
-// var Coin1 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin1");
-// var Coin2 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin2");
-// var Coin3 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin3");
-
-//this.enemy = this.physics.add.sprite(120, 134, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin2.x, Coin2.y, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin3.x, Coin3.y, "coin").play("coins");
-
 //Block the player(collide with this layer)
 this.wallLayer.setCollisionByProperty({WallWall: true});
 this.decoLayer.setCollisionByProperty({libraryWall: true, deskWall: true});
 this.physics.add.collider( this.wallLayer , this.player);
 this.physics.add.collider( this.decoLayer , this.player);
 this.physics.add.collider( this.coinLayer , this.player);
+this.physics.add.collider( this.coinSLayer , this.player);
 
 
 // setTileIndexCallback coin
-//collect item (follow the name from tiles)
+//collect item (follow the name from tiles)s
 //name in tiled (item1) check for the number +1
-this.coinLayer.setTileIndexCallback(1065, this.removeItem, this);
+this.coinLayer.setTileIndexCallback(1065, this.removeItem1, this);
+this.coinSLayer.setTileIndexCallback(1069, this.removeItem2, this);
+
 
 
 //character NPC
 this.dasha = this.physics.add.sprite(178, 177,'dasha').setScale(1.5).play("dasha");
 this.physics.add.collider(this.player, this.dasha);
 
+//Overlap
 this.physics.add.overlap(this.player, this.dasha, this.dashaOverlap, null, this);
+
+
+//coin at the top left wondow
+this.coin1 = this.add.sprite(50, 50, "coin").setScrollFactor(0).setVisible(false)
+this.coinS = this.add.sprite(100, 50, "coinS").setScrollFactor(0).setVisible(false)
+
 
 
 
@@ -148,6 +157,7 @@ this.time.addEvent({
 
 dashaOverlap() {
   console.log(" dasha overlap player");
+  this.sound2.play();
   this.scene.start("GameOver");
 }
 
@@ -217,11 +227,22 @@ this.world();
     this.scene.start("world", { playerPos: playerPos });
   }
 
-  //player touch the item then collet them
-removeItem(player, tile) {
+ //player touch the item then collet them
+ removeItem1(player, tile) {
+  this.sound1.play();
   console.log("remove item", tile.index);
   this.coinLayer.removeTileAt(tile.x, tile.y); // remove the item
+  this.coin1.setVisible(true);
   return false;
 }
+
+removeItem2(player, tile) {
+  this.sound1.play();
+  console.log("remove item", tile.index);
+  this.coinSLayer.removeTileAt(tile.x, tile.y); // remove the item
+  this.coinS.setVisible(true);
+  return false;
+}
+
  
 }

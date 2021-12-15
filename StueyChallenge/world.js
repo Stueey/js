@@ -14,21 +14,35 @@ class world extends Phaser.Scene {
     // Step 1, load JSON
     this.load.tilemapTiledJSON("world", "assets/mainMap.json");
 
-    //character 
-        this.load.atlas('coin','assets/coin.png', 'assets/coin.json')
-        //this.load.atlas('dasha','assets/dasha.png', 'assets/dasha.json')
-        this.load.atlas('stuey','assets/stuey.png', 'assets/stuey.json')
-        //this.load.atlas('zuzu','assets/zuzu.png', 'assets/zuzu.json')
-        this.load.atlas('coin2','assets/coin.png', 'assets/coin.json')
+//character 
+this.load.atlas('coin','assets/coin.png', 'assets/coin.json')
 
-    // Step 2 : Preload any images here, nickname, filename
-    this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
-    this.load.image("village", "assets/Serene_Village_32x32.png");
+//this.load.atlas('dasha','assets/dasha.png', 'assets/dasha.json')
+this.load.atlas('stuey','assets/stuey.png', 'assets/stuey.json')
+//this.load.atlas('zuzu','assets/zuzu.png', 'assets/zuzu.json')
+this.load.atlas('coin2','assets/coin.png', 'assets/coin.json')
+
+// Step 2 : Preload any images here, nickname, filename
+this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
+this.load.image("village", "assets/Serene_Village_32x32.png");
+
+//sound effect 
+this.load.audio("coinss", "assets/coinSound.wav");
+this.load.audio("losingSound", "assets/losingSound.wav");
+this.load.audio("bgm", "assets/bgm.mp3");
+
+
+//this.load.audio("bgmusic", 'assets/coinSound.mp3');
   }
 
   create() {
     console.log("*** world scene");
     window.map = map;
+
+
+    
+   // this.coinSound = this.sound.add("coin2");
+    //this.losingSound = this.sound.add("losingSound");
 
     //Step 3 - Create the map from main
     var map = this.make.tilemap({key: 'world'});
@@ -137,37 +151,20 @@ this.physics.world.bounds.width = this.bottomGreenLayer.width;
 this.physics.world.bounds.height = this.bottomGreenLayer.height;
 
 
-
-//load object COin
-// var Start = map.findObject("ObjectLayer1", (obj) => obj.name === "start111");
-// var Coin1 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin1");
-// var Coin2 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin2");
-// var Coin3 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin3");
-// var Coin4 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin4");
-// var Coin5 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin5");
-// var Coin6 = map.findObject("ObjectLayer1", (obj) => obj.name === "coin6");
-
-// this.enemy = this.physics.add.sprite(Coin1.x, Coin1.y, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin2.x, Coin2.y, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin3.x, Coin3.y, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin4.x, Coin4.y, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin5.x, Coin5.y, "coin").play("coins");
-// this.enemy = this.physics.add.sprite(Coin6.x, Coin6.y, "coin").play("coins");
-
-
-
 //Block the player(collide with this layer)
 this.tiangLayer.setCollisionByProperty({tiangWall: true});
 this.treeLayer.setCollisionByProperty({treeWall: true});
 this.decoLayer.setCollisionByProperty({WallWall: true, boardWall: true, poolWall: true,  flowerWall: true});
 this.gardenRockLayer.setCollisionByProperty({gardenRockWall: true});
 this.houseLayer.setCollisionByProperty({houseWall: true});
+this.bridgeLayer.setCollisionByProperty({woodWall: true});
 this.physics.add.collider( this.tiangLayer , this.player);
 this.physics.add.collider( this.treeLayer , this.player);
 this.physics.add.collider( this.decoLayer , this.player);
 this.physics.add.collider( this.gardenRockLayer , this.player);
 this.physics.add.collider( this.houseLayer , this.player);
 this.physics.add.collider( this.coinLayer , this.player);
+this.physics.add.collider( this.bridgeLayer , this.player);
 
 
 
@@ -175,13 +172,20 @@ this.physics.add.collider( this.coinLayer , this.player);
 //collect item (follow the name from tiles)
 //name in tiled (item1) check for the number +1
 this.coinLayer.setTileIndexCallback(1920, this.removeItem, this);
+// this.coinLayer.setTileIndexCallback(1920, this.removeItem1, this);
 
 
 // // create the arrow keys
 this.cursors = this.input.keyboard.createCursorKeys();
 
+//sound
+this.sound1 = this.sound.add('coinss');
+this.sound2 = this.sound.add('longBoo');
+this.sound3 = this.sound.add('bgm');
 
 
+this.coin1 = this.add.sprite(50, 50, "coin").setScrollFactor(0).setVisible(false)
+// this.coin2 = this.add.sprite(100, 50, "coin2").setScrollFactor(0).setVisible(false)
 
 
 }
@@ -191,6 +195,18 @@ this.cursors = this.input.keyboard.createCursorKeys();
   /////////////////// end of create //////////////////////////////
 
   update() {/////////////////// end of update //////////////////////////////
+
+
+//enter for winScene
+if ( this.player.x > 13 
+  && this.player.x < 117
+  && this.player.y > 1253 
+  && this.player.y < 1273
+  && window.coin>=1) {
+
+  this.winScene();
+  }
+
 
 
 //enter for room2
@@ -286,8 +302,17 @@ room3(player, tile) {
 
 //player touch the item then collet them
 removeItem(player, tile) {
+  this.sound1.play();
   console.log("remove item", tile.index);
   this.coinLayer.removeTileAt(tile.x, tile.y); // remove the item
+  this.coin1.setVisible(true);
+  window.coin++;
   return false;
+}
+
+
+winScene() {
+  console.log("player win")
+   this.scene.start("winScene")
 }
 } //////////// end of class world ////////////////////////

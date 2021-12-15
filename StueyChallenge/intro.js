@@ -22,6 +22,7 @@ class intro extends Phaser.Scene {
     this.load.image("village", "assets/Serene_Village_32x32.png");
     this.load.image("firstPage", "assets/firstPage.png");
     this.load.image("rules", "assets/rules.png");
+    //this.load.image("winScene", "assets/winningScene.png");
 
 
   }

@@ -23,6 +23,7 @@ class intro2 extends Phaser.Scene {
     this.load.image("firstPage", "assets/firstPage.png");
     this.load.image("rules", "assets/rules.png");
     this.load.image("character", "assets/character.png");
+    this.load.image("winningScene", "assets/winningScene.png");
 
 
 

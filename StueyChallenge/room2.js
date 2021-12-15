@@ -20,6 +20,12 @@ this.load.atlas('coin2','assets/coin.png', 'assets/coin.json')
 
 // Step 2 : Preload any images here, nickname, filename
 this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
+this.load.image("coin", "assets/coin.png");
+this.load.image("coinS", "assets/coinS.png");
+
+this.sound1 = this.sound.add('coinss');
+this.sound2 = this.sound.add('losingSound');
+
     }
 
     create() {
@@ -34,13 +40,16 @@ this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
     //var village = map.addTilesetImage("village", "village");
     var pipoya = map.addTilesetImage("pipoya", "pipoya");
     var coni2 = map.addTilesetImage("coin","coin2")
+    var coinS = map.addTilesetImage("coinS","coinS")
 
     // Step 5  Load in layers by layers
     this.floorLayer = map.createLayer("floorLayer", [pipoya], 0, 0);
     this.wallLayer = map.createLayer("wallLayer", [pipoya], 0, 0);
     this.decoLayer = map.createLayer("decoLayer", [pipoya], 0, 0);
     this.foodUpperLayer = map.createLayer("foodUpperLayer", [pipoya], 0, 0);
+    this.coinSLayer = map.createLayer("coinSLayer", coinS, 0,0);
     this.coinLayer = map.createLayer("coinLayer", coni2, 0,0);
+
 
     //character animation NPC
     this.anims.create({
@@ -107,20 +116,25 @@ this.decoLayer.setCollisionByProperty({libraryWall: true, deskWall2: true,  deco
 this.physics.add.collider( this.wallLayer , this.player);
 this.physics.add.collider( this.decoLayer , this.player);
 this.physics.add.collider( this.coinLayer , this.player);
+this.physics.add.collider( this.coinSLayer , this.player);
 
 
-//collect coin
-//setTileIndexCallback
-//collect item (follow the name from tiles)
+
+// setTileIndexCallback coin
+//collect item (follow the name from tiles)s
 //name in tiled (item1) check for the number +1
-this.coinLayer.setTileIndexCallback(1065, this.removeItem, this);
-
+this.coinLayer.setTileIndexCallback(1065, this.removeItem1, this);
+this.coinSLayer.setTileIndexCallback(1069, this.removeItem2, this);
 
 
 //character NPC
 this.zuzu = this.physics.add.sprite(135, 201,'zuzu').setScale(1.5).play("zuzu");
-
+//overlap
 this.physics.add.overlap(this.player, this.zuzu, this.zuzuOverlap, null, this);
+
+//coin at the top left wondow
+this.coin1 = this.add.sprite(50, 50, "coin").setScrollFactor(0).setVisible(false)
+this.coin2 = this.add.sprite(100, 50, "coinS").setScrollFactor(0).setVisible(false)
 
 
 
@@ -207,14 +221,26 @@ this.world();
 
  zuzuOverlap() {
   console.log(" zuzu overlap player");
+  this.sound2.play();
   this.scene.start("GameOver");
 }
 
-//player touch the item then collet them
-removeItem(player, tile) {
+  //player touch the item then collet them
+  removeItem1(player, tile) {
+    this.sound1.play();
+    console.log("remove item", tile.index);
+    this.coinLayer.removeTileAt(tile.x, tile.y); // remove the item
+    this.coin1.setVisible(true);
+    return false;
+  }
+
+removeItem2(player, tile) {
+  this.sound1.play();
   console.log("remove item", tile.index);
-  this.coinLayer.removeTileAt(tile.x, tile.y); // remove the item
+  this.coinSLayer.removeTileAt(tile.x, tile.y); // remove the item
+  this.coin2.setVisible(true);
   return false;
 }
+
   
 }

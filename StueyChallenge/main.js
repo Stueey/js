@@ -21,11 +21,12 @@ class main extends Phaser.Scene {
   this.load.image("pipoya", "assets/[Base]BaseChip_pipo.png");
   this.load.image("village", "assets/Serene_Village_32x32.png");
   this.load.image("firstPage", "assets/firstPage.png");
+  //this.load.image("winscene", "assets/winningScene.png");
 
-    // Preload all the assets here
-    
-
-    // Preload any images here
+  //sound effect 
+this.load.audio("coinss", "assets/coinSound.wav");
+this.load.audio("longBoo", "assets/dudu.wav");
+this.load.audio("bgm", "assets/bgm.mp3");
   
     
   }
@@ -34,6 +35,10 @@ class main extends Phaser.Scene {
     console.log("*** main scene");
     this.add.image(0, 0, 'firstPage').setOrigin(0, 0).setScale(1);
 
+    this.sound1 = this.sound.add('coinss');
+    this.sound2 = this.sound.add('longBoo');
+    this.sound3 =  this.sound.add("bgm",{loop:true,}).setVolume(0.1);
+    this.sound3.play();
    
     this.anims.create({
       key: 'up',
@@ -104,6 +109,8 @@ this.anims.create({
 
     // Check for spacebar or any key here
     var spaceDown = this.input.keyboard.addKey("SPACE");
+    var key1 = this.input.keyboard.addKey(49);
+
 
     // On spacebar event, call the world scene
     spaceDown.on(
@@ -115,6 +122,19 @@ this.anims.create({
         playerPos.y = 349.63;
         playerPos.dir = "up";
         this.scene.start("intro", { playerPos: playerPos });
+      },
+      this
+    );
+
+    key1.on(
+      "down",
+      function () {
+        console.log("Jump to world scene");
+        let playerPos = {};
+        playerPos.x = 1125.65;
+        playerPos.y = 349.63;
+        playerPos.dir = "up";
+        this.scene.start("world", { playerPos: playerPos });
       },
       this
     );
